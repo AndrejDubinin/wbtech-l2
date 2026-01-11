@@ -20,11 +20,16 @@ func main() {
 
 func transform(input string) string {
 	var prev rune
-	result := make([]rune, len(input))
+	result := make([]rune, 0, len(input))
 
-	for i, char := range input {
+	for _, char := range input {
+		if prev == '\x00' {
+			prev = char
+			continue
+		}
+
 		if isDigit(char) {
-			if i == 0 {
+			if isDigit(prev) {
 				return ""
 			}
 
@@ -37,7 +42,7 @@ func transform(input string) string {
 		}
 		prev = char
 	}
-	if !isDigit(prev) {
+	if !isDigit(prev) && prev != '\x00' {
 		result = append(result, prev)
 	}
 	return string(result)
