@@ -1,14 +1,16 @@
 package main
 
 import (
+	"errors"
 	"testing"
 )
 
 func TestTransform(t *testing.T) {
 	tests := []struct {
-		name  string
-		input string
-		want  string
+		name    string
+		input   string
+		want    string
+		wantErr error
 	}{
 		{
 			name:  "normal",
@@ -21,9 +23,10 @@ func TestTransform(t *testing.T) {
 			want:  "abcd",
 		},
 		{
-			name:  "number",
-			input: "45",
-			want:  "",
+			name:    "number",
+			input:   "45",
+			want:    "",
+			wantErr: errInvalidInput,
 		},
 		{
 			name:  "empty",
@@ -44,9 +47,15 @@ func TestTransform(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := transform(tt.input)
-			if result != tt.want {
-				t.Errorf("[%s] transform(%s) = %q, want %q", tt.name, tt.input, result, tt.want)
+			result, err := transform(tt.input)
+			if tt.wantErr == nil {
+				if result != tt.want {
+					t.Errorf("[%s] transform(%s), got: %q, want: %q", tt.name, tt.input, result, tt.want)
+				}
+				return
+			}
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("[%s] transform(%s), got: %v, want: %v", tt.name, tt.input, err, tt.wantErr)
 			}
 		})
 	}

@@ -1,8 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 )
+
+var errInvalidInput = errors.New("invalid input")
 
 func main() {
 	strArr := []string{
@@ -15,12 +18,16 @@ func main() {
 	}
 
 	for _, str := range strArr {
-		result := transform(str)
-		fmt.Println(result)
+		result, err := transform(str)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(result)
+		}
 	}
 }
 
-func transform(input string) string {
+func transform(input string) (string, error) {
 	var prev rune
 	var tr bool
 	var digitCount int
@@ -68,10 +75,10 @@ func transform(input string) string {
 	}
 
 	if digitCount == len(input) {
-		result = result[:0]
+		return "", errInvalidInput
 	}
 
-	return string(result)
+	return string(result), nil
 }
 
 func isDigit(char rune) bool {
