@@ -30,13 +30,23 @@ func TestTransform(t *testing.T) {
 			input: "",
 			want:  "",
 		},
+		{
+			name:  "escape",
+			input: `qwe\4\5`,
+			want:  "qwe45",
+		},
+		{
+			name:  "escape with repeat",
+			input: `qwe\45`,
+			want:  "qwe44444",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := transform(tt.input)
 			if result != tt.want {
-				t.Errorf("[%q] transform(%q) = %q, want %q", tt.name, tt.input, result, tt.want)
+				t.Errorf("[%s] transform(%s) = %q, want %q", tt.name, tt.input, result, tt.want)
 			}
 		})
 	}

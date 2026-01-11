@@ -10,6 +10,8 @@ func main() {
 		"abcd",
 		"45",
 		"",
+		"qwe\\4\\5",
+		"qwe\\45",
 	}
 
 	for _, str := range strArr {
@@ -20,31 +22,55 @@ func main() {
 
 func transform(input string) string {
 	var prev rune
+	var tr bool
+	var digitCount int
 	result := make([]rune, 0, len(input))
 
-	for _, char := range input {
-		if prev == '\x00' {
-			prev = char
+	for _, curr := range input {
+		if tr || prev == '\x00' {
+			tr = false
+			prev = curr
+			if isDigit(curr) {
+				digitCount++
+			}
 			continue
 		}
 
-		if isDigit(char) {
-			if isDigit(prev) {
-				return ""
+		if isDigit(curr) {
+			digitCount++
+			tr = true
+
+			if prev == '\\' {
+				result = append(result, curr)
+				continue
 			}
 
-			count := char - '0'
+			count := curr - '0'
 			for range count {
 				result = append(result, prev)
 			}
-		} else if !isDigit(prev) {
+		} else {
 			result = append(result, prev)
 		}
-		prev = char
+		prev = curr
 	}
-	if !isDigit(prev) && prev != '\x00' {
-		result = append(result, prev)
+	if !tr && prev != '\x00' {
+		if isDigit(prev) {
+			count := prev - '0'
+			count--
+			prev = result[len(result)-1]
+			for range count {
+				result = append(result, prev)
+			}
+		} else {
+			result = append(result, prev)
+		}
 	}
+
+	if digitCount == len(input) {
+		result = result[:0]
+	}
+
 	return string(result)
 }
 
